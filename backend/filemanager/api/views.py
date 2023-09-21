@@ -62,7 +62,7 @@ class FileUpload(APIView):
 class YourFileView(View):
     def get(self, request, file_name):
         # Постройте путь к файлу на основе имени файла
-        file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+        file_path = os.path.join(settings.MEDIA_ROOT, "uploads", file_name)
 
         # Отправьте файл в ответе
         response = FileResponse(open(file_path, "rb"))
