@@ -1,0 +1,67 @@
+version: "3.8"
+services:
+
+  db:
+    image: postgres:13.0-alpine
+    container_name: test_postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ../backend/.env
+
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: test_backend
+    restart: always
+    volumes:
+      - static_value:/backend/static/
+      - media_value:/backend/media/
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../backend/.env
+
+
+  redis:
+    image: redis:latest
+    container_name: test_redis
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+
+
+  celery:
+    image: celery
+    container_name: test_celery
+    depends_on:
+      - backend
+    env_file:
+      - ../backend/.env
+
+
+  nginx:
+    image: nginx:1.21.3-alpine
+    container_name: test_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.local.conf:/etc/nginx/conf.d/default.conf
+      - static_value:/var/html/static/
+      - media_value:/var/html/media/
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  redis_data:
+  static_value:
+  media_value:
