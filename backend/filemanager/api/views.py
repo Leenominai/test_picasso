@@ -22,7 +22,7 @@ class FileList(generics.ListCreateAPIView):
 
     queryset = File.objects.all()
     serializer_class = FileSerializer
-    http_method_names = ['get']
+    http_method_names = ["get"]
 
 
 class FileDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -64,7 +64,7 @@ class FileUpload(APIView):
         else:
             return Response(
                 {"error": f"File size exceeds the maximum allowed size ({settings.FILE_UPLOAD_MAX_MEMORY_SIZE} bytes)"},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
 
