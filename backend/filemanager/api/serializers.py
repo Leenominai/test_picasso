@@ -10,5 +10,9 @@ class FileSerializer(serializers.ModelSerializer):
     # Добавьте это поле для предоставления URL без /media/
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret["file"] = ret["file"].replace("/media/", "/")
+
+        # Получите абсолютный URL для файла и замените '/media/' на '/'
+        file_url = instance.file.url
+        ret["file"] = file_url.replace('/media/', '/')
+
         return ret

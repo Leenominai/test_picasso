@@ -48,24 +48,35 @@ class FileUpload(APIView):
     """
 
     def post(self, request, format=None):
-        uploaded_file = request.FILES.get("file")
+        uploaded_files = request.FILES.getlist("file")
 
-        if uploaded_file and uploaded_file.size <= settings.FILE_UPLOAD_MAX_MEMORY_SIZE:
-            serializer = FileSerializer(data=request.data)
-            if serializer.is_valid():
-                # Сохраните файл на сервере
-                file_instance = serializer.save()
+        if not uploaded_files:
+            return Response({"error": "No files were uploaded."}, status=status.HTTP_400_BAD_REQUEST)
 
-                # Запустите асинхронную задачу для обработки файла с использованием Celery
-                process_uploaded_file.delay(file_instance.id)
+        # Создадим список для хранения данных о всех загруженных файлах
+        serialized_data = []
 
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(
-                {"error": f"File size exceeds the maximum allowed size ({settings.FILE_UPLOAD_MAX_MEMORY_SIZE} bytes)"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        for uploaded_file in uploaded_files:
+            if uploaded_file and uploaded_file.size <= settings.FILE_UPLOAD_MAX_MEMORY_SIZE:
+                serializer = FileSerializer(data={"file": uploaded_file})
+
+                if serializer.is_valid():
+                    file_instance = serializer.save()
+
+                    process_uploaded_file.delay(file_instance.id)
+
+                    # Добавим данные о файле в список
+                    serialized_data.append(serializer.data)
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(
+                    {"error": f"File size exceeds the maximum allowed size "
+                              f"({settings.FILE_UPLOAD_MAX_MEMORY_SIZE} bytes)"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        return Response(serialized_data, status=status.HTTP_201_CREATED)
 
 
 class YourFileView(View):
