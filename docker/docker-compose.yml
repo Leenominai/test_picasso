@@ -47,6 +47,7 @@ services:
       - INFO
     volumes:
       - ../backend:/usr/src/app
+      - media_value:/backend/media/
     environment:
       - CELERY_BROKER=redis://redis:6379/0
       - CELERY_BACKEND=redis://redis:6379/0
