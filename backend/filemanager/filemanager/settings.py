@@ -68,8 +68,23 @@ DATABASES = {
         "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="postgres"),
         "HOST": os.getenv("DB_HOST", default="db"),
         "PORT": os.getenv("DB_PORT", default="5432"),
+    },
+    "test": {
+        "ENGINE": os.getenv("TEST_DB_ENGINE", default="django.db.backends.postgresql"),
+        "NAME": os.getenv("TEST_POSTGRES_DB", default="test_postgres"),
+        "USER": os.getenv("TEST_POSTGRES_USER", default="test_postgres"),
+        "PASSWORD": os.getenv("TEST_POSTGRES_PASSWORD", default="test_postgres"),
+        "HOST": os.getenv("DB_HOST", default="db"),
+        "PORT": os.getenv("DB_PORT", default="5432"),
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 
 AUTH_PASSWORD_VALIDATORS = [
