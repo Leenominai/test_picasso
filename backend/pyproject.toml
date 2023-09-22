@@ -15,6 +15,7 @@ celery = "^5.3.4"
 psycopg2-binary = "^2.9.7"
 redis = "^5.0.0"
 pillow = "^10.0.1"
+pymupdf = "^1.23.3"
 
 
 [tool.poetry.group.test.dependencies]

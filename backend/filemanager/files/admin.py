@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import File
+from .models import File, TextDocument
 
 
 @admin.register(File)
@@ -11,3 +11,8 @@ class FileAdmin(admin.ModelAdmin):
         return obj.file.name.split("/")[-1]  # Возвращает только имя файла без пути
 
     file_name.short_description = "Загруженный файл"  # Задайте желаемое имя столбца
+
+
+@admin.register(TextDocument)
+class TextDocumentAdmin(admin.ModelAdmin):
+    list_display = ("id", "title",)
