@@ -22,6 +22,7 @@ class FileList(generics.ListCreateAPIView):
 
     queryset = File.objects.all()
     serializer_class = FileSerializer
+    http_method_names = ['get']
 
 
 class FileDetail(generics.RetrieveUpdateDestroyAPIView):
