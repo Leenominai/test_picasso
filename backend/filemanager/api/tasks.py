@@ -8,6 +8,9 @@ from PIL import Image
 from django.conf import settings
 import mimetypes
 from files.models import File, TextDocument
+from rest_framework import status
+
+MAX_EDIT_SIZE = 1024 * 1024 * 2  # 2 MB
 
 
 def process_pdf(file_path, file_instance):
@@ -29,6 +32,12 @@ def process_uploaded_file(file_id):
         file_instance = File.objects.get(pk=file_id)
 
         file_path = settings.MEDIA_ROOT / file_instance.file.name
+
+        if not os.path.exists(file_path):
+            return {"error": "File does not exist", "status_code": status.HTTP_400_BAD_REQUEST}
+
+        if os.path.getsize(file_path) > MAX_EDIT_SIZE:
+            return {"error": "File size exceeds the maximum allowed size", "status_code": status.HTTP_400_BAD_REQUEST}
 
         mime_type, _ = mimetypes.guess_type(file_path)
 
@@ -66,4 +75,7 @@ def process_uploaded_file(file_id):
         file_instance.save()
 
     except File.DoesNotExist:
-        pass
+        return {"error": "File not found", "status_code": status.HTTP_400_BAD_REQUEST}
+
+    except Exception as e:
+        return {"error": f"An error occurred: {str(e)}", "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR}
