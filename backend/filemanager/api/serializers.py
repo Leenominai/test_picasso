@@ -13,6 +13,6 @@ class FileSerializer(serializers.ModelSerializer):
 
         # Получите абсолютный URL для файла и замените '/media/' на '/'
         file_url = instance.file.url
-        ret["file"] = file_url.replace('/media/', '/')
+        ret["file"] = file_url.replace("/media/", "/")
 
         return ret

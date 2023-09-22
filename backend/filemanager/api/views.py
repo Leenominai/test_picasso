@@ -11,7 +11,7 @@ from django.conf import settings
 from django.http import FileResponse
 
 
-class FileList(generics.ListCreateAPIView):
+class FileListView(generics.ListCreateAPIView):
     """
     Список файлов и создание новых файлов.
 
@@ -25,7 +25,7 @@ class FileList(generics.ListCreateAPIView):
     http_method_names = ["get"]
 
 
-class FileDetail(generics.RetrieveUpdateDestroyAPIView):
+class FileDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     Детали файла, обновление и удаление.
 
@@ -38,7 +38,7 @@ class FileDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FileSerializer
 
 
-class FileUpload(APIView):
+class FileUploadView(APIView):
     """
     Загрузка файла.
 
@@ -71,8 +71,10 @@ class FileUpload(APIView):
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response(
-                    {"error": f"File size exceeds the maximum allowed size "
-                              f"({settings.FILE_UPLOAD_MAX_MEMORY_SIZE} bytes)"},
+                    {
+                        "error": f"File size exceeds the maximum allowed size "
+                        f"({settings.FILE_UPLOAD_MAX_MEMORY_SIZE} bytes)"
+                    },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
