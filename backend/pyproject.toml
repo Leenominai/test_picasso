@@ -11,6 +11,14 @@ django = ">=3.2,<4.0"
 djangorestframework = "^3.14.0"
 python-dotenv = "^1.0.0"
 pre-commit = "^3.4.0"
+celery = "^5.3.4"
+psycopg2-binary = "^2.9.7"
+redis = "^5.0.0"
+pillow = "^10.0.1"
+
+
+[tool.poetry.group.test.dependencies]
+pre-commit = "^3.4.0"
 
 
 [build-system]
