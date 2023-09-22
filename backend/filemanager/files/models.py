@@ -16,3 +16,6 @@ class File(models.Model):
     file = models.FileField(upload_to="uploads/", verbose_name="Загруженный файл")
     uploaded_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата и время загрузки")
     processed = models.BooleanField(default=False, verbose_name="Файл обработан")
+
+    def __str__(self):
+        return self.file.name

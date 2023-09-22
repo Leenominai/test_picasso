@@ -4,10 +4,10 @@ from .models import File
 
 @admin.register(File)
 class FileAdmin(admin.ModelAdmin):
-    """
-    Отображение модели Files в Админке.
-    """
+    list_display = ("id", "file_name", "uploaded_at", "processed")
+    readonly_fields = ("file_name", "uploaded_at", "processed")
 
-    list_display = ("file", "uploaded_at", "processed")
-    list_filter = ("processed",)
-    search_fields = ("file",)
+    def file_name(self, obj):
+        return obj.file.name.split("/")[-1]  # Возвращает только имя файла без пути
+
+    file_name.short_description = "Загруженный файл"  # Задайте желаемое имя столбца

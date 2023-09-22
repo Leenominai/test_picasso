@@ -6,4 +6,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/", include("api.urls")),
     path("uploads/<str:file_name>", YourFileView.as_view(), name="file-view"),
+    path("media/uploads/<str:file_name>", YourFileView.as_view(), name="file-view"),
 ]
