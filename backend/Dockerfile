@@ -10,4 +10,9 @@ RUN poetry config virtualenvs.create false && poetry install --without test --no
 
 COPY filemanager /backend
 
-CMD ["python3", "manage.py", "runserver", "0:8000"]
+RUN chmod +x entrypoint.sh
+ENTRYPOINT ["./entrypoint.sh"]
+
+CMD ["gunicorn", "itm_backend.wsgi:application", "--bind", "0:8000" ]
+
+LABEL author='leenominai' version='develop v1.0' broken_keyboards=1
