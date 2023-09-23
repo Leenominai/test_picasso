@@ -19,3 +19,19 @@ class File(models.Model):
 
     def __str__(self):
         return self.file.name
+
+
+class TextDocument(models.Model):
+    """
+    Модель для хранения текстовых документов с указанием заголовка и содержимого.
+
+    Поля:
+    - title: Поле типа CharField для хранения заголовка документа.
+    - content: Поле типа TextField для хранения содержимого документа.
+    """
+
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+
+    def __str__(self):
+        return self.title

@@ -1,5 +1,4 @@
 import os
-from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -10,14 +9,11 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure")
-# SECRET_KEY = 'django-insecure-8bx=uq%$sc!g5=2ve91$e%x=$u46*^-jk=05l&fq^dmbaycr3o'
 
 DEBUG = True
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
 
-
-# Application definition
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -30,6 +26,7 @@ INSTALLED_APPS = [
     "api.apps.ApiConfig",
     "files.apps.FilesConfig",
     "django.contrib.postgres",
+    "drf_spectacular",
     "celery",
 ]
 
@@ -44,6 +41,17 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "filemanager.urls"
+
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "International Team Management Platfopm API",
+    "DESCRIPTION": "International Team Management Platfopm",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
 
 TEMPLATES = [
     {
@@ -64,9 +72,6 @@ TEMPLATES = [
 WSGI_APPLICATION = "filemanager.wsgi.application"
 
 
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
 DATABASES = {
     "default": {
         "ENGINE": os.getenv("DB_ENGINE", default="django.db.backends.postgresql"),
@@ -75,12 +80,24 @@ DATABASES = {
         "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="postgres"),
         "HOST": os.getenv("DB_HOST", default="db"),
         "PORT": os.getenv("DB_PORT", default="5432"),
-    }
+    },
+    "test": {
+        "ENGINE": os.getenv("TEST_DB_ENGINE", default="django.db.backends.postgresql"),
+        "NAME": os.getenv("TEST_POSTGRES_DB", default="test_postgres"),
+        "USER": os.getenv("TEST_POSTGRES_USER", default="test_postgres"),
+        "PASSWORD": os.getenv("TEST_POSTGRES_PASSWORD", default="test_postgres"),
+        "HOST": os.getenv("DB_HOST", default="db"),
+        "PORT": os.getenv("DB_PORT", default="5432"),
+    },
 }
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
 
-# Password validation
-# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -98,9 +115,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/3.2/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "UTC"
@@ -112,9 +126,6 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.2/howto/static-files/
-
 STATIC_URL = "/static/"
 
 STATIC_ROOT = BASE_DIR / "static"
@@ -123,8 +134,6 @@ MEDIA_URL = "/media/"
 
 MEDIA_ROOT = BASE_DIR / "media"
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -136,3 +145,7 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 
 CELERY_TIMEZONE = "UTC"
+
+FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 3  # 3 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 3  # 3 MB
+MAX_EDIT_MEMORY_SIZE = 1024 * 1024 * 2  # 2 MB

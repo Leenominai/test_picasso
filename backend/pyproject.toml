@@ -15,6 +15,10 @@ celery = "^5.3.4"
 psycopg2-binary = "^2.9.7"
 redis = "^5.0.0"
 pillow = "^10.0.1"
+pymupdf = "^1.23.3"
+pytest = "^7.4.2"
+pytest-django = "^4.5.2"
+drf-spectacular = "^0.26.5"
 
 
 [tool.poetry.group.test.dependencies]

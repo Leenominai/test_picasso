@@ -10,5 +10,29 @@ class FileSerializer(serializers.ModelSerializer):
     # Добавьте это поле для предоставления URL без /media/
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret["file"] = ret["file"].replace("/media/", "/")
+
+        file_url = instance.file.url
+        ret["file"] = file_url.replace("/media/", "/")
+
         return ret
+
+
+class BadRequestErrorSerializer(serializers.Serializer):
+    detail = serializers.CharField(
+        default="BadRequest.",
+        help_text="Сообщение об ошибке",
+    )
+
+
+class NotFoundErrorSerializer(serializers.Serializer):
+    detail = serializers.CharField(
+        default="Not found.",
+        help_text="Сообщение об ошибке",
+    )
+
+
+class InternalServerErrorSerializer(serializers.Serializer):
+    detail = serializers.CharField(
+        default="Internal server error.",
+        help_text="Сообщение об ошибке",
+    )

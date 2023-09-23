@@ -4,27 +4,31 @@ from django.views import View
 from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import FileSerializer
-from .tasks import process_uploaded_file
-from files.models import File
 from django.conf import settings
 from django.http import FileResponse
+from drf_spectacular.utils import extend_schema
+from files.models import File
+from .serializers import FileSerializer
+from .tasks import process_uploaded_file
+from .decorators import files_view_set_schema
 
 
-class FileList(generics.ListCreateAPIView):
+@extend_schema(tags=["Просмотр списка файлов"])
+@files_view_set_schema
+class FileListView(generics.ListCreateAPIView):
     """
-    Список файлов и создание новых файлов.
+    Этот метод позволяет посмотреть список всех загруженных файлов.
 
     - `GET`: Возвращает список всех файлов.
-    - `POST`: Создает новый файл. При успешной загрузке файла, запускается асинхронная задача
-      для его обработки с использованием Celery.
     """
 
     queryset = File.objects.all()
     serializer_class = FileSerializer
+    http_method_names = ["get"]
 
 
-class FileDetail(generics.RetrieveUpdateDestroyAPIView):
+@extend_schema(tags=["Просмотр деталей файла"])
+class FileDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     Детали файла, обновление и удаление.
 
@@ -37,33 +41,67 @@ class FileDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FileSerializer
 
 
-class FileUpload(APIView):
+class FileUploadView(APIView):
     """
     Загрузка файла.
 
     - `POST`: Принимает POST-запросы для загрузки файлов. После успешной загрузки файла,
       запускает асинхронную задачу для его обработки с использованием Celery и возвращает
       статус 201 Created и сериализованные данные файла.
+
+    Примечание:
+    При загрузке файла выполняется его асинхронная обработка, и результат будет доступен позже.
     """
 
     def post(self, request, format=None):
-        serializer = FileSerializer(data=request.data)
-        if serializer.is_valid():
-            # Сохраните файл на сервере
-            file_instance = serializer.save()
+        uploaded_files = request.FILES.getlist("file")
 
-            # Запустите асинхронную задачу для обработки файла с использованием Celery
-            process_uploaded_file.delay(file_instance.id)
+        if not uploaded_files:
+            return Response({"error": "No files were uploaded."}, status=status.HTTP_400_BAD_REQUEST)
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serialized_data = []
+
+        for uploaded_file in uploaded_files:
+            if uploaded_file and uploaded_file.size <= settings.FILE_UPLOAD_MAX_MEMORY_SIZE:
+                serializer = FileSerializer(data={"file": uploaded_file})
+
+                if serializer.is_valid():
+                    file_instance = serializer.save()
+
+                    process_uploaded_file.delay(file_instance.id)
+
+                    serialized_data.append(serializer.data)
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(
+                    {
+                        "error": f"File size exceeds the maximum allowed size "
+                        f"({settings.FILE_UPLOAD_MAX_MEMORY_SIZE} bytes)"
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        return Response(serialized_data, status=status.HTTP_201_CREATED)
 
 
 class YourFileView(View):
+    """
+    Просмотр файла.
+
+    Этот класс предоставляет способ просмотра файла по его имени. Клиентский код
+    может отправить GET-запрос с именем файла на путь /uploads/'имя', и этот класс найдет соответствующий файл
+    в медиа-хранилище и отправит его в ответе.
+
+    - `GET`: Возвращает запрошенный файл в ответе.
+
+    Примечание:
+    Этот класс полезен для просмотра файлов, загруженных на сервер, и может использоваться,
+    например, для просмотра изображений, документов и других типов файлов.
+    """
+
     def get(self, request, file_name):
-        # Постройте путь к файлу на основе имени файла
         file_path = os.path.join(settings.MEDIA_ROOT, "uploads", file_name)
 
-        # Отправьте файл в ответе
         response = FileResponse(open(file_path, "rb"))
         return response
