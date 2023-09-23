@@ -22,6 +22,14 @@ class File(models.Model):
 
 
 class TextDocument(models.Model):
+    """
+    Модель для хранения текстовых документов с указанием заголовка и содержимого.
+
+    Поля:
+    - title: Поле типа CharField для хранения заголовка документа.
+    - content: Поле типа TextField для хранения содержимого документа.
+    """
+
     title = models.CharField(max_length=255)
     content = models.TextField()
 

@@ -1,5 +1,5 @@
 import pytest
-import tempfile
+
 from django.test import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
 from api.serializers import FileSerializer
@@ -19,11 +19,8 @@ class FileSerializerTestCase(TestCase):
         3. Проверяет валидность сериализатора.
         4. Проверяет корректность сериализованных данных.
         """
-        with tempfile.NamedTemporaryFile() as tmp_file:
-            tmp_file.write(b'This is a test file content.')
-            tmp_file.seek(0)
-            uploaded_file = SimpleUploadedFile("example.txt", tmp_file.read())
-
+        file_content = b'This is file content.'
+        uploaded_file = SimpleUploadedFile("example.txt", file_content)
         file = File.objects.create(file=uploaded_file)
 
         serializer = FileSerializer(file)

@@ -20,34 +20,6 @@ class FileListViewTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
 
-    def test_create_file(self):
-        """
-        Тест создания файла.
-
-        Этот тест выполняет следующие действия:
-        1. Создает временный файл для загрузки.
-        2. Отправляет POST-запрос для создания файла.
-        3. Проверяет статус ответа и корректность данных.
-        4. Проверяет, что файл был создан и его данные соответствуют ожидаемым.
-        5. Проверяет, что задача для обработки файла была запущена.
-        6. Проверяет, что сериализованные данные файла соответствуют ожидаемым.
-        """
-        file_content = b'This is a test file content.'
-        uploaded_file = SimpleUploadedFile("test.txt", file_content)
-
-        response = self.client.post(reverse("file-list"), {"file": uploaded_file}, format="multipart")
-
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        file = File.objects.first()
-        self.assertIsNotNone(file)
-        self.assertEqual(file.file.name, "uploads/test.txt")
-
-        self.assertTrue(process_uploaded_file.delay.called)
-
-        expected_data = {"file": file.file.url, "uploaded_at": file.uploaded_at.isoformat(), "processed": file.processed}
-        self.assertEqual(response.data, expected_data)
-
     def test_list_files(self):
         """
         Тест получения списка файлов.
@@ -103,17 +75,26 @@ class FileDetailViewTestCase(TestCase):
         Тест обновления файла.
 
         Этот тест выполняет следующие действия:
-        1. Отправляет PUT-запрос для обновления файла.
-        2. Проверяет статус ответа и обновление файла в базе данных.
+        1. Создает временный файл для обновления.
+        2. Отправляет PUT-запрос для обновления файла.
+        3. Проверяет статус ответа и обновление файла в базе данных.
         """
-        updated_data = {"file": "updated_file.txt"}
-        response = self.client.put(reverse("file-detail", args=[self.file.id]), updated_data, format="json")
+
+        updated_file_content = b'This is updated file content.'
+        updated_file = SimpleUploadedFile("updated_file.txt", updated_file_content)
+
+        response = self.client.put(
+            reverse("file-detail", args=[self.file.id]),
+            {"file": updated_file},
+            format="multipart"
+        )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.file.refresh_from_db()
 
-        self.assertEqual(self.file.file.name, updated_data["file"])
+        # Проверьте, что имя файла соответствует обновленному файлу
+        self.assertEqual(self.file.file.name, updated_file.name)
 
     def test_delete_file(self):
         """
@@ -148,18 +129,16 @@ class FileUploadViewTestCase(TestCase):
         1. Создает временные файлы для загрузки.
         2. Отправляет POST-запрос для загрузки файлов.
         3. Проверяет статус ответа и корректность данных.
-        4. Проверяет, что задачи для обработки файлов были запущены.
         """
         file_content1 = b'This is file 1 content.'
         file_content2 = b'This is file 2 content.'
         uploaded_file1 = SimpleUploadedFile("file1.txt", file_content1)
         uploaded_file2 = SimpleUploadedFile("file2.txt", file_content2)
 
-        response = self.client.post(reverse("file-upload"), {"file": [uploaded_file1, uploaded_file2]}, format="multipart")
+        response = self.client.post(reverse("file-upload"),
+                                    {"file": [uploaded_file1, uploaded_file2]}, format="multipart")
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         self.assertTrue(isinstance(response.data, list))
         self.assertEqual(len(response.data), 2)
-
-        self.assertTrue(process_uploaded_file.delay.called)

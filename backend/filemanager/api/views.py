@@ -4,20 +4,22 @@ from django.views import View
 from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import FileSerializer
-from .tasks import process_uploaded_file
-from files.models import File
 from django.conf import settings
 from django.http import FileResponse
+from drf_spectacular.utils import extend_schema
+from files.models import File
+from .serializers import FileSerializer
+from .tasks import process_uploaded_file
+from .decorators import files_view_set_schema
 
 
+@extend_schema(tags=["Просмотр списка файлов"])
+@files_view_set_schema
 class FileListView(generics.ListCreateAPIView):
     """
-    Список файлов и создание новых файлов.
+    Этот метод позволяет посмотреть список всех загруженных файлов.
 
     - `GET`: Возвращает список всех файлов.
-    - `POST`: Создает новый файл. При успешной загрузке файла, запускается асинхронная задача
-      для его обработки с использованием Celery.
     """
 
     queryset = File.objects.all()
@@ -25,6 +27,7 @@ class FileListView(generics.ListCreateAPIView):
     http_method_names = ["get"]
 
 
+@extend_schema(tags=["Просмотр деталей файла"])
 class FileDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     Детали файла, обновление и удаление.
@@ -45,6 +48,9 @@ class FileUploadView(APIView):
     - `POST`: Принимает POST-запросы для загрузки файлов. После успешной загрузки файла,
       запускает асинхронную задачу для его обработки с использованием Celery и возвращает
       статус 201 Created и сериализованные данные файла.
+
+    Примечание:
+    При загрузке файла выполняется его асинхронная обработка, и результат будет доступен позже.
     """
 
     def post(self, request, format=None):
@@ -53,7 +59,6 @@ class FileUploadView(APIView):
         if not uploaded_files:
             return Response({"error": "No files were uploaded."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Создадим список для хранения данных о всех загруженных файлах
         serialized_data = []
 
         for uploaded_file in uploaded_files:
@@ -65,7 +70,6 @@ class FileUploadView(APIView):
 
                     process_uploaded_file.delay(file_instance.id)
 
-                    # Добавим данные о файле в список
                     serialized_data.append(serializer.data)
                 else:
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -82,10 +86,22 @@ class FileUploadView(APIView):
 
 
 class YourFileView(View):
+    """
+    Просмотр файла.
+
+    Этот класс предоставляет способ просмотра файла по его имени. Клиентский код
+    может отправить GET-запрос с именем файла на путь /uploads/'имя', и этот класс найдет соответствующий файл
+    в медиа-хранилище и отправит его в ответе.
+
+    - `GET`: Возвращает запрошенный файл в ответе.
+
+    Примечание:
+    Этот класс полезен для просмотра файлов, загруженных на сервер, и может использоваться,
+    например, для просмотра изображений, документов и других типов файлов.
+    """
+
     def get(self, request, file_name):
-        # Постройте путь к файлу на основе имени файла
         file_path = os.path.join(settings.MEDIA_ROOT, "uploads", file_name)
 
-        # Отправьте файл в ответе
         response = FileResponse(open(file_path, "rb"))
         return response

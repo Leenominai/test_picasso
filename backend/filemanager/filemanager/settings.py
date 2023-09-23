@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     "api.apps.ApiConfig",
     "files.apps.FilesConfig",
     "django.contrib.postgres",
+    "drf_spectacular",
     "celery",
 ]
 
@@ -40,6 +41,17 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "filemanager.urls"
+
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "International Team Management Platfopm API",
+    "DESCRIPTION": "International Team Management Platfopm",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
 
 TEMPLATES = [
     {
@@ -136,3 +148,4 @@ CELERY_TIMEZONE = "UTC"
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 3  # 3 MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 3  # 3 MB
+MAX_EDIT_MEMORY_SIZE = 1024 * 1024 * 2  # 2 MB
