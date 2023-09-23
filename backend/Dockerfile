@@ -13,6 +13,6 @@ COPY filemanager /backend
 RUN chmod +x entrypoint.sh
 ENTRYPOINT ["./entrypoint.sh"]
 
-CMD ["gunicorn", "itm_backend.wsgi:application", "--bind", "0:8000" ]
+CMD ["gunicorn", "filemanager.wsgi:application", "--bind", "0:8000" ]
 
 LABEL author='leenominai' version='develop v1.0' broken_keyboards=1

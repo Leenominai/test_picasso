@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build_and_push_backend_to_docker_hub:
@@ -103,7 +106,7 @@ jobs:
       # Получение активного коммита
       - name: Get commit SHA
         run: echo "COMMIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
-      # Отправка сообщения в канал https://t.me/itm_project_actions
+      # Отправка сообщения в канал
       - name: Send message to Telegram Channel
         uses: appleboy/telegram-action@master
         with:
