@@ -1,4 +1,4 @@
-# File Upload and Processing API (filemanager)
+# Тестовое задание Пикассо: Загрузка и обработка файлов
 
 ## Описание ТЗ
 
