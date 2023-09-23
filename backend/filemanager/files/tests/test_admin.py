@@ -1,4 +1,3 @@
-import pytest
 from django.test import TestCase
 from django.urls import reverse
 from django.test import Client
@@ -6,7 +5,6 @@ from rest_framework import status
 from files.models import File, TextDocument
 
 
-@pytest.mark.django_db(transaction=True)
 class AdminTestCase(TestCase):
     def setUp(self):
         self.client = Client()

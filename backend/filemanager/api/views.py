@@ -10,11 +10,9 @@ from drf_spectacular.utils import extend_schema
 from files.models import File
 from .serializers import FileSerializer
 from .tasks import process_uploaded_file
-from .decorators import files_view_set_schema
 
 
 @extend_schema(tags=["Просмотр списка файлов"])
-@files_view_set_schema
 class FileListView(generics.ListCreateAPIView):
     """
     Этот метод позволяет посмотреть список всех загруженных файлов.
@@ -41,6 +39,7 @@ class FileDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FileSerializer
 
 
+@extend_schema(tags=["Загрузка файла"])
 class FileUploadView(APIView):
     """
     Загрузка файла.
