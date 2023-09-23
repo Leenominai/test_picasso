@@ -31,6 +31,7 @@ class TextDocumentAdmin(admin.ModelAdmin):
     Административный интерфейс для модели TextDocument.
 
     """
+
     list_display = (
         "id",
         "title",

@@ -1,4 +1,3 @@
-import pytest
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -8,7 +7,6 @@ from api.serializers import FileSerializer
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 
-@pytest.mark.django_db(transaction=True)
 class FileListViewTestCase(TestCase):
     """
     Тесты для API-вьюсета FileListView.
@@ -42,7 +40,6 @@ class FileListViewTestCase(TestCase):
         self.assertEqual(response.data, expected_data)
 
 
-@pytest.mark.django_db(transaction=True)
 class FileDetailViewTestCase(TestCase):
     """
     Тесты для API-вьюсета FileDetailView.
@@ -84,13 +81,13 @@ class FileDetailViewTestCase(TestCase):
         self.assertFalse(File.objects.filter(pk=self.file.id).exists())
 
 
-@pytest.mark.django_db(transaction=True)
 class FileUploadViewTestCase(TestCase):
     """
     Тесты для API-вьюсета FileUploadView.
 
     Этот класс содержит тесты для метода API-вьюсета, отвечающего за загрузку файлов.
     """
+
     def setUp(self):
         self.client = APIClient()
 
@@ -103,13 +100,14 @@ class FileUploadViewTestCase(TestCase):
         2. Отправляет POST-запрос для загрузки файлов.
         3. Проверяет статус ответа и корректность данных.
         """
-        file_content1 = b'This is file 1 content.'
-        file_content2 = b'This is file 2 content.'
+        file_content1 = b"This is file 1 content."
+        file_content2 = b"This is file 2 content."
         uploaded_file1 = SimpleUploadedFile("file1.txt", file_content1)
         uploaded_file2 = SimpleUploadedFile("file2.txt", file_content2)
 
-        response = self.client.post(reverse("file-upload"),
-                                    {"file": [uploaded_file1, uploaded_file2]}, format="multipart")
+        response = self.client.post(
+            reverse("file-upload"), {"file": [uploaded_file1, uploaded_file2]}, format="multipart"
+        )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 

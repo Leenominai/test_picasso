@@ -1,12 +1,9 @@
-import pytest
-
 from django.test import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
 from api.serializers import FileSerializer
 from files.models import File
 
 
-@pytest.mark.django_db(transaction=True)
 class FileSerializerTestCase(TestCase):
     def test_file_serializer(self):
         """
@@ -19,7 +16,7 @@ class FileSerializerTestCase(TestCase):
         3. Проверяет валидность сериализатора.
         4. Проверяет корректность сериализованных данных.
         """
-        file_content = b'This is file content.'
+        file_content = b"This is file content."
         uploaded_file = SimpleUploadedFile("example.txt", file_content)
         file = File.objects.create(file=uploaded_file)
 

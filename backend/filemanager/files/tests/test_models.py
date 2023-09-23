@@ -1,9 +1,7 @@
-import pytest
 from django.test import TestCase
 from files.models import File, TextDocument
 
 
-@pytest.mark.django_db(transaction=True)
 class FileModelTestCase(TestCase):
     def setUp(self):
         self.file = File.objects.create(file="test_file.txt")

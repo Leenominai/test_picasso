@@ -1,11 +1,9 @@
-import pytest
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from files.models import File
 
 
-@pytest.mark.django_db(transaction=True)
 class URLTestCase(TestCase):
     def test_file_list_url(self):
         """
