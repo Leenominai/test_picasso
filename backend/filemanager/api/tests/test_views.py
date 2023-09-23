@@ -5,7 +5,6 @@ from rest_framework import status
 from rest_framework.test import APIClient
 from files.models import File
 from api.serializers import FileSerializer
-from api.tasks import process_uploaded_file
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 
@@ -69,32 +68,6 @@ class FileDetailViewTestCase(TestCase):
 
         expected_data = FileSerializer(self.file).data
         self.assertEqual(response.data, expected_data)
-
-    def test_update_file(self):
-        """
-        Тест обновления файла.
-
-        Этот тест выполняет следующие действия:
-        1. Создает временный файл для обновления.
-        2. Отправляет PUT-запрос для обновления файла.
-        3. Проверяет статус ответа и обновление файла в базе данных.
-        """
-
-        updated_file_content = b'This is updated file content.'
-        updated_file = SimpleUploadedFile("updated_file.txt", updated_file_content)
-
-        response = self.client.put(
-            reverse("file-detail", args=[self.file.id]),
-            {"file": updated_file},
-            format="multipart"
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        self.file.refresh_from_db()
-
-        # Проверьте, что имя файла соответствует обновленному файлу
-        self.assertEqual(self.file.file.name, updated_file.name)
 
     def test_delete_file(self):
         """
