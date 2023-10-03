@@ -126,13 +126,13 @@ docker-compose up -d
 ```
 - Применение миграций: Примените миграции Django для создания необходимых таблиц в базе данных:
 ```shell
-docker exec -it itm_backend bash
+docker exec -it test_backend bash
 python manage.py migrate
 exit
 ```
 - Создание профиля суперпользователя для доступа в админ-консоль (по желанию):
 ```shell
-docker exec -it itm_backend bash 
+docker exec -it test_backend bash 
 python manage.py createsuperuser
 exit
 ```
@@ -141,7 +141,7 @@ exit
 
 Уделено внимание тестированию нашего приложения. Это важно для обеспечения стабильности и надежности приложения. На сервере оно выполняется автоматически, а на локальной машине это можно проверить в ручную:
 ```shell
-docker exec -it itm_backend bash
+docker exec -it test_backend bash
 python manage.py test -v 2
 exit
 ```
@@ -163,9 +163,7 @@ exit
 
 - **http://127.0.0.1:8000/admin/**: админ-консоль
 ```shell
-    Параметры входа:
-    Username = admin
-    Password = test_admin
+    Параметры входа те, которые вы прописывали при создании профиля администратора.
  ```
 - **http://127.0.0.1:8000/admin/files/file/**: список загруженных файлов
 - **http://127.0.0.1:8000/admin/files/textdocument/**: список обработанных текстовых файлов

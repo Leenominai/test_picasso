@@ -47,8 +47,8 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "International Team Management Platfopm API",
-    "DESCRIPTION": "International Team Management Platfopm",
+    "TITLE": "Filemanager",
+    "DESCRIPTION": "PICASSO Test - Filemanager",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
